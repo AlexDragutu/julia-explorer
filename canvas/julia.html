@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Julia Set Explorer</title>
+	<meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="julia.css"/>
+	<script type="text/javascript" src="jquery.min.js"></script>
+	<script type="text/javascript" src="complex.js"></script>
+	<script type="text/javascript" src="julia.js"></script>
+</head>
+<body>
+	<div id="body_div">
+		<div id="f_type" class="container">
+			<div id="types">
+				<b><center>Julia Set Type:</center></b><p>
+			<table cellspacing="5">
+			<tr><td><input id="classic" type="radio" name="type" value="classic">Classic:</input></td>
+				<td><select id="s_classic">
+					<option value="1">Round</option>
+					<option value="2">Spirals</option>
+					<option value="3">Dendrite</option>
+					<option value="4">Butterfly</option>
+					<option value="5">Snakes</option>
+					<option value="6">Cactus</option>
+					<option value="7">Tumors</option>
+				</select></td></tr>
+			<tr><td><input id="poly" type="radio" name="type" value="poly">Polynomial:</input></td>
+				<td><select id="s_poly">
+					<option value="1">Cubic</option>
+					<option value="2">Quartic</option>
+					<option value="3">Butterfly 1</option>
+					<option value="4">Butterfly 2</option>
+					<option value="5">Bowtie</option>
+					<option value="6">Squiggly</option>
+				</select></td></tr>
+			<tr><td><input id="exp" type="radio" name="type" value="exp">Exponential:</input></td>
+				<td><select id="s_exp">
+					<option value="1">Flowers</option>
+					<option value="2">Bulb</option>
+					<option value="3">Star</option>
+				</select></td></tr>
+			<tr><td><input id="trig" type="radio" name="type" value="trig">Trigonometric:</input></td>
+				<td><select id="s_trig">
+					<option value="1">Sine 1</option>
+					<option value="2">Sine 2</option>
+					<option value="3">Cosine</option>
+				</select></td></tr>
+			<tr><td><input id="other" type="radio" name="type" value="rat">Other:</input></td>
+				<td><select id="s_other">
+					<option value="1">Cell</option>
+					<option value="2">Cocoon</option>
+					<option value="3">Trees</option>
+				</select></td></tr>
+			</table>
+			</div>
+		</div>
+		<div id="Panel">
+			<div id="julia_settings" class="container">
+				<div  id="param">
+					<table cellpadding="2">
+					<b><center>Parameters:</center></b><p>
+					<tr>
+						<td>Formula:</td>
+						<td id="formula">n/a<td>
+					<tr>
+						<td><center>c =</center></td>
+						<td>
+							<input type="text" size=3 id="c_real"></input> +
+							<input type="text" size=3 id="c_imag"></input> i
+						</td>
+					</tr>
+					<tr>
+						<td><center>Iterations:</center></td>
+						<td><input type="text" size=3 id="iter"></input></td>
+					</tr>
+				</table>
+				</div><p>
+				<center>
+				<input type="button" id="update" value = "Update"></input>
+				<input type="button" id="resetZoom" value = "Reset"></input>
+				<input type="button" id="colors" value = "Cycle Colors"></input></center>
+			</div>
+		</div>
+		<div id="instruct" class="container">
+			<div id="ins_title"><b><center>Instructions:</center></b></div>
+				<textarea class="scaling-textarea" readonly>
+Select Julia set type and a sample, and the fractal will be shown on the right.
+Alternatively, you can manually edit the parameters in the bottom left section.
+Left click:  Zoom in on clicked area
+Right click: Zoom out
+				</textarea>
+		</div>
+
+		<div id="CanvasDiv" class="container">
+			<b><center>Render:</center></b>
+			<canvas id="myCanvas" width="512" height="512">Your browser doesn't support Canvas.</canvas>
+		</div>
+
+		<div id="info" class="container">
+			<b><center>Info:</center></b><br>
+			<br>
+			<table cellspacing="5">
+				<tr><td><b>Properties</b></td>
+				<tr><td>Zoom Level: </td>
+				<td><span id="div_zoom"></span></td></tr>
+				<tr><td><b>Coordinates</b></td>
+				<tr><td>Center Point: </td>
+				<td>(<span id="div_cx">0</span>, <span id="div_cy">0</span>)</td></tr>
+				<tr><td>Upper Left: </td>
+				<td>(<span id="div_TLx">0</span>, <span id="div_TLy">0</span>)</td></tr>
+				<tr><td>Lower Right: </td>
+				<td>(<span id="div_BRx">0</span>, <span id="div_BRy">0</span>)</td></tr>
+			</table>
+		</div>
+
+		<div id="navigation" class="container">
+			<b><center>Navigation:</center></b><br>
+			<br>
+			<table cellspacing="5">
+				<tr><td>Zoom Level: </td>
+				<td><input type="text" size=10 id="nav_zoom"></input></td></tr>
+				<tr><td>Center Point: </td>
+				<td><input type="text" size=10 id="nav_cx"></input> , <input type="text" size=10 id="nav_cy"></input></td></tr>
+			</table><br>
+			<center><input type="button" id="nav_go" value="Go"></input></center>
+		</div>
+		<div id="tooltip"></div>
+	</div>
+
+    <div class="button-container">
+        <a href="../index.html" class="back-button">Go Back</a>
+    </div>
+</body>
+</html>

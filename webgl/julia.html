@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Julia Set Explorer</title> 
+	<meta charset="utf-8"> 
+    <link rel="stylesheet" type="text/css" href="julia.css"/>	
+	<script id="shader-vs" type="x-shader/x-vertex">
+		attribute vec2 aPosition;
+		uniform vec2 u_offset;
+		uniform vec2 u_size;
+		varying vec2 vPosition;
+
+		void main(void) 
+		{
+			gl_Position = vec4(aPosition, 0.0, 1.0);
+			vPosition = aPosition * u_size / 2.0 + u_offset;
+			vPosition.y *= -1.0;
+		}
+	</script>
+	<script id="shader-fs" type="x-shader/x-fragment">
+		precision highp float;
+		varying vec2 vPosition;
+		
+		uniform vec2 u_param;
+		uniform float u_raza;
+		uniform float u_jType;
+		uniform float u_hueoff;
+		
+		vec2 multiply(vec2 a, vec2 b)
+		{
+			vec2 r;
+			r.x = a.x * b.x - a.y * b.y;
+			r.y = a.x * b.y + b.x * a.y;
+			return r;
+		}
+		
+		vec2 divide(vec2 a, vec2 b) {
+			vec2 r;
+		    r.x = (a.x * b.x + a.y * b.y) / (b.x * b.x + b.y * b.y);
+			r.y = (a.y * b.x - a.x * b.y) / (b.x * b.x + b.y * b.y);
+			return r;
+		}
+		
+		vec2 csqrt(vec2 z) {
+			float Re, Im;
+			Re = sqrt((z.x + sqrt(z.x * z.x + z.y * z.y)) / 2.0);
+			if (Re != 0.0) Im = z.y / (2.0 * Re);
+			else {
+				Im = sqrt((-z.x + sqrt(z.x * z.x + z.y * z.y)) / 2.0);
+				if (Im != 0.0) Re = Im / (2.0 * z.y);
+			}
+			return vec2(Re, Im);
+		}
+		
+		vec2 csin(vec2 z) {
+			vec2 r;
+			r.x = 0.5 * sin(z.x) * (exp(z.y) + exp(-z.y));
+			r.y = 0.5 * cos(z.x) * (exp(z.y) - exp(-z.y));
+			return r;
+		}
+		
+		vec2 ccos(vec2 z) {
+			vec2 r;
+			r.x = 0.5 * cos(z.x) * (exp(z.y) + exp(-z.y));
+			r.y = 0.5 * sin(z.x) * (exp(z.y) - exp(-z.y));
+			return r;
+		}
+		
+		vec2 compute(vec2 z) {
+			vec2 r;
+			if (u_jType == 0.0) { //classic
+				r = multiply(z, z) + u_param;
+			}
+			else if (u_jType == 1.0) { //tri
+				r = multiply(multiply(z, z), z) + u_param;
+			}
+			else if (u_jType == 2.0) { //quad
+				r = multiply(multiply(z, z), multiply(z, z)) + u_param;
+			}
+			else if (u_jType == 3.0) { //poly
+				r = multiply(multiply(u_param, z), vec2(1.0, 0.0) - z);
+			}
+			else if (u_jType == 4.0) { //poly4
+				r = multiply(multiply(z, z), multiply(z, z)) - z - u_param;
+			}
+			else if (u_jType == 5.0) { //poly6
+				r = multiply(multiply(multiply(z, z), multiply(z, z)), multiply(z, z)) - multiply(z, z) - u_param;;
+			}
+			else if (u_jType == 6.0) { //sin
+				r = multiply(u_param, csin(z));
+			}
+			else if (u_jType == 7.0) { //cos
+				r = multiply(multiply(u_param, vec2(0.0, 1.0)), ccos(z));
+			}
+			else if (u_jType == 8.0) { //rat
+				r = divide(multiply(multiply(z, z), z) + u_param, multiply(multiply(z, z), z) - u_param);
+			}
+			else if (u_jType == 9.0) { //conj
+				r = multiply(vec2(z.x, -z.y), vec2(z.x, -z.y)) + u_param;
+			}
+			else if (u_jType == 10.0) { //abs
+				vec2 v = vec2(abs(z.x), abs(z.y));
+				r = multiply(v, v) + u_param;
+			}
+			else if (u_jType == 11.0) { //tree
+				r = multiply(z, csqrt(z)) + u_param;
+			}
+			return r;
+		}
+		
+		void main(void)
+		{
+			vec2 z = vPosition;
+			vec2 new_z;			
+			float modul;
+			int it = 0;
+			for (int i = 0; i <= #iter#; i++) {
+				it = i;
+				new_z = compute(z);				
+				modul = dot(new_z, new_z);
+				if (modul > u_raza) {
+					break;
+				}
+				z = new_z;
+			}
+			if (it < #iter#) {
+				float hue = -(float(it) - log(modul)/9.21) / 70.0;		 
+				const float saturation = 1.0;
+				const float value = 1.0;				
+				float hueRound = hue * 6.0 - u_hueoff;
+				int hueIndex = int(mod(float(int(hueRound)), 6.0));
+				float f = fract(hueRound);
+				float p = value * (1.0 - saturation);
+				float q = value * (1.0 - f * saturation);
+				float t = value * (1.0 - (1.0 - f) * saturation);
+
+				if (hueIndex == 0)
+					gl_FragColor = vec4(value, t, p, 1.0);
+				else if (hueIndex == 1)
+					gl_FragColor = vec4(q, value, p, 1.0);
+				else if (hueIndex == 2)
+					gl_FragColor = vec4(p, value, t, 1.0);
+				else if (hueIndex == 3)
+					gl_FragColor = vec4(p, q, value, 1.0);
+				else if (hueIndex == 4)
+					gl_FragColor = vec4(t, p, value, 1.0);
+				else if (hueIndex == 5)
+					gl_FragColor = vec4(value, p, q, 1.0);		 
+			} else gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+		}
+	</script>
+	<script type="text/javascript" src="jquery.min.js"></script>
+	<script type="text/javascript" src="julia.js"></script>
+</head> 
+<body>
+	<div id="body_div">
+		<div id="f_type" class="container">
+			<div id="types">
+				<b><center>Julia Set Type:</center></b><p>
+			<table cellspacing="5">
+			<tr><td><input id="classic" type="radio" name="type" value="classic">Classic:</input></td>
+				<td><select id="s_classic">
+					<option value="1">Round</option>
+					<option value="2">Spirals</option>
+					<option value="3">Dendrite</option>
+					<option value="4">Butterfly</option>
+					<option value="5">Snakes</option>
+					<option value="6">Cactus</option>
+					<option value="7">Tumors</option>
+				</select></td></tr>
+			<tr><td><input id="poly" type="radio" name="type" value="poly">Polynomial:</input></td>
+				<td><select id="s_poly">
+					<option value="1">Cubic</option>
+					<option value="2">Quartic</option>
+					<option value="3">Butterfly 1</option>
+					<option value="4">Butterfly 2</option>
+					<option value="5">Bowtie</option>
+					<option value="6">Squiggly</option>
+				</select></td></tr>
+			
+			<tr><td><input id="trig" type="radio" name="type" value="trig">Trigonometric:</input></td>
+				<td><select id="s_trig">
+					<option value="1">Sine 1</option>
+					<option value="2">Sine 2</option>
+					<option value="3">Cosine</option>
+				</select></td></tr>
+			<tr><td><input id="other" type="radio" name="type" value="rat">Other:</input></td>
+				<td><select id="s_other">
+					<option value="1">Cell</option>
+					<option value="2">Cocoon</option>
+					<option value="3">Trees</option>
+				</select></td></tr>
+			</table>
+			</div>
+		</div>
+		<div id="Panel">	
+			<div id="julia_settings" class="container">
+				<div  id="param">
+					<table cellpadding="2">
+					<b><center>Parameters:</center></b><p>
+					<tr>
+						<td>Formula:</td>
+						<td id="formula">n/a<td>
+					<tr>
+						<td><center>c =</center></td>
+						<td>
+							<input type="text" size=3 id="c_real"></input> +
+							<input type="text" size=3 id="c_imag"></input> i
+						</td>
+					</tr>
+					<tr>
+						<td><center>Iterations:</center></td>
+						<td><input type="text" size=3 id="iter"></input></td>
+					</tr>
+				</table>
+				</div><p>
+				<center>
+				<input type="button" id="update" value = "Update"></input>
+				<input type="button" id="resetZoom" value = "Reset"></input>
+				<input type="button" id="colors" value = "Cycle Colors"></input></center>
+			</div>
+		</div>	
+		<div id="instruct" class="container">
+			<div id="ins_title"><b><center>Instructions:</center></b><p></div>
+			<textarea class="scaling-textarea" readonly>
+Select Julia set type and a sample, and the fractal will be shown on the right.
+Alternatively, you can manually edit the parameters in the bottom left section.
+Click: Toggle Moving
+Click & Drag: Zoom
+				</textarea>
+		</div>
+		
+		<div id="CanvasDiv" class="container">
+			<b><center>Render:</center></b>
+			<canvas id="myCanvas" width="512" height="512">Browser-ul nu suporta Canvas.</canvas>
+		</div>
+		
+		<div id="info" class="container">
+			<b><center>Information:</center></b><br>
+			<br>
+			<table cellspacing="5">
+				<tr><td><b>Properties</b></td>
+				<tr><td>Zoom Level: </td>
+				<td><span id="div_zoom"></span></td></tr>
+				<tr><td><b>Coordinates</b></td>
+				<tr><td>Center Point: </td>
+				<td>(<span id="div_cx">0</span>, <span id="div_cy">0</span>)</td></tr>	
+				<tr><td>Upper Left: </td>
+				<td>(<span id="div_TLx">0</span>, <span id="div_TLy">0</span>)</td></tr>
+				<tr><td>Lower Right: </td>
+				<td>(<span id="div_BRx">0</span>, <span id="div_BRy">0</span>)</td></tr>				
+			</table>
+		</div>
+		
+		<div id="navigation" class="container">
+			<b><center>Navigation:</center></b><br>
+			<br>
+			<table cellspacing="5">	
+				<tr><td>Zoom Level: </td>
+				<td><input type="text" size=10 id="nav_zoom"></input></td></tr>
+				<tr><td>Center Point: </td>
+				<td><input type="text" size=10 id="nav_cx"></input> , <input type="text" size=10 id="nav_cy"></input></td></tr>
+			</table><br>			
+			<center><input type="button" id="nav_go" value="Go"></input></center>
+		</div>		
+		<div id="tooltip"></div>
+	</div>
+
+	<div class="button-container">
+		<a href="../index.html" class="back-button">Go Back</a>
+	</div>
+</body>
+</html>

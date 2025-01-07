@@ -1,0 +1,179 @@
+body {
+	padding:0px;
+	margin:0px;
+}
+
+#body_div {
+	background:#666;
+	background:-webkit-gradient(linear,left bottom,left top,color-stop(0.68, rgb(71,71,71)),color-stop(0, rgb(142,145,145))) no-repeat;
+	width:100%;
+	height:100%;
+	position:fixed;
+}
+ 
+ #CanvasDiv {
+	width: 512px;
+	height: 532px;
+	background: #222;
+	border: #000 1px solid;	
+	left: 290px;
+	top: 15px;
+	position: absolute;
+	font-family: "Arial";
+	color: #fff;
+	padding: 2px;
+}
+
+#julia_settings {
+	width: 250px;
+	height: 193px;	
+	background: #222;
+	left: 15px;
+	top: 360px;
+	position: absolute;
+	font-family: "Arial";
+	color: #fff;
+}
+
+#info {
+	width: 355px;
+	height: 320px;
+	background: #222;
+	left: 833px;
+	top: 15px;
+	position: absolute;
+	font-family: "Arial";
+	color: #fff;
+	padding:5px;
+}
+
+#navigation {
+	width: 355px;
+	height: 185px;
+	background: #222;
+	left: 833px;
+	top: 358px;
+	position: absolute;
+	font-family: "Arial";
+	color: #fff;
+	padding:5px;
+}
+
+#f_type {
+	width: 250px;
+	height: 190px;
+	background: #222;
+	left: 15px;
+	top: 155px;
+	position: absolute;
+	font-family: "Arial";
+	color: #fff;
+}
+
+#instruct {
+	width: 250px;
+	height: 125px;
+	background: #222;
+	left: 15px;
+	top: 15px;
+	position: absolute;
+	font-family: "Arial";
+	color: #fff;
+}
+
+#instruct_ {
+	font-size: 90%;	
+	position: relative;
+	margin: 5px;
+}
+
+#types {
+	position: relative;
+	margin: 5px;
+}
+
+#param {
+	position: relative;
+	margin: 5px;
+}
+
+#ins_title {
+	position: relative;
+	margin: 5px;
+}
+
+.container {
+	border-radius:8px;
+	box-shadow: 3px 3px 5px rgba(0,0,0,0.5);
+}
+
+.scaling-textarea {
+    width: 100%;
+    height: calc(100% - 35px);
+    padding: 10px;
+    background-color: #222;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    resize: none;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+/* Custom scrollbar styles for WebKit browsers */
+.scaling-textarea::-webkit-scrollbar {
+    width: 12px;
+}
+.scaling-textarea::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.scaling-textarea::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+.scaling-textarea::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+/* Custom scrollbar styles for Firefox */
+.scaling-textarea {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+}
+
+.button-container {
+    text-align: left;
+    margin: 15px;
+    position: fixed;
+    top: 570px;
+}
+
+.back-button {
+    background-color: #222;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}
+
+#div_cx, #div_cy, #div_TLx, #div_TLy, #div_BRx, #div_BRy {
+	font-size:8pt;
+}
+
+#div_zoom {
+	font-size:10pt;
+}
+
+#tooltip {
+	background:rgba(0,0,0,0.85);
+	color:rgba(255, 255, 255, 0.85);
+	border-radius:4px;
+	position:fixed;
+	padding:3px;
+}
